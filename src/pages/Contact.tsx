@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
-import { Mail, Linkedin, Instagram, Twitter, Send } from "lucide-react";
+import { Mail, Linkedin, Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollReveal } from "@/hooks/useScrollAnimation";
@@ -65,25 +65,19 @@ const Contact = () => {
                 <Card className="bg-card border-border">
                   <CardContent className="p-6">
                     <h3 className="font-heading text-lg font-bold mb-3">Email</h3>
-                    <a href="mailto:ricardo@example.com" className="text-primary text-sm flex items-center gap-2 hover:underline">
-                      <Mail size={16} /> ricardo@example.com
+                    <a href="mailto:riradoro03@gmail.com" className="text-primary text-sm flex items-center gap-2 hover:underline">
+                      <Mail size={16} /> riradoro03@gmail.com
                     </a>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card border-border">
-                  <CardContent className="p-6">
+                <CardContent className="p-6">
                     <h3 className="font-heading text-lg font-bold mb-4">Follow Me</h3>
                     <div className="flex gap-3">
-                      {[
-                        { icon: Linkedin, label: "LinkedIn", href: "#" },
-                        { icon: Instagram, label: "Instagram", href: "#" },
-                        { icon: Twitter, label: "Twitter/X", href: "#" },
-                      ].map(({ icon: Icon, label, href }, i) => (
-                        <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-md bg-muted text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors text-sm">
-                          <Icon size={16} /> {label}
-                        </a>
-                      ))}
+                      <a href="https://www.linkedin.com/in/ricardo-ramon-dominguez-rodriguez/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-md bg-muted text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors text-sm">
+                        <Linkedin size={16} /> LinkedIn
+                      </a>
                     </div>
                   </CardContent>
                 </Card>

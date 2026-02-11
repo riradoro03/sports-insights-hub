@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Linkedin, Instagram, Mail, Twitter } from "lucide-react";
+import { Linkedin, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const Footer = () => {
@@ -53,10 +53,8 @@ const Footer = () => {
             <h4 className="font-heading text-sm font-semibold mb-3 text-primary">Connect</h4>
             <div className="flex gap-3">
               {[
-                { icon: Linkedin, href: "#" },
-                { icon: Instagram, href: "#" },
-                { icon: Twitter, href: "#" },
-                { icon: Mail, href: "mailto:ricardo@example.com" },
+                { icon: Linkedin, href: "https://www.linkedin.com/in/ricardo-ramon-dominguez-rodriguez/" },
+                { icon: Mail, href: "mailto:riradoro03@gmail.com" },
               ].map(({ icon: Icon, href }, i) => (
                 <a
                   key={i}
