@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Layout from "@/components/Layout";
 import { Clock, Calendar, ArrowRight } from "lucide-react";
+import { ScrollReveal } from "@/hooks/useScrollAnimation";
 
 const articles = [
   {
@@ -59,36 +60,46 @@ const Blog = () => {
     <Layout>
       <section className="py-20 lg:py-28">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-primary/10 text-primary border-0">Insights</Badge>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-3">
-              Analysis & <span className="text-primary">Content</span>
-            </h1>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Thoughts, breakdowns, and reflections on the world of sports business.
-            </p>
-          </div>
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-primary/10 text-primary border-0">Insights</Badge>
+              <h1 className="text-4xl md:text-5xl font-heading font-bold mb-3">
+                Analysis & <span className="text-primary">Content</span>
+              </h1>
+              <p className="text-muted-foreground max-w-lg mx-auto">
+                Thoughts, breakdowns, and reflections on the world of sports business.
+              </p>
+            </div>
+          </ScrollReveal>
 
           <Tabs defaultValue="all" className="max-w-3xl mx-auto">
-            <TabsList className="mb-8 mx-auto flex w-fit bg-muted">
-              <TabsTrigger value="all" onClick={() => setFilter("all")} className="font-heading text-sm">All</TabsTrigger>
-              <TabsTrigger value="analysis" onClick={() => setFilter("analysis")} className="font-heading text-sm">Analysis</TabsTrigger>
-              <TabsTrigger value="blog" onClick={() => setFilter("blog")} className="font-heading text-sm">Blog Posts</TabsTrigger>
-            </TabsList>
+            <ScrollReveal>
+              <TabsList className="mb-8 mx-auto flex w-fit bg-muted">
+                <TabsTrigger value="all" onClick={() => setFilter("all")} className="font-heading text-sm">All</TabsTrigger>
+                <TabsTrigger value="analysis" onClick={() => setFilter("analysis")} className="font-heading text-sm">Analysis</TabsTrigger>
+                <TabsTrigger value="blog" onClick={() => setFilter("blog")} className="font-heading text-sm">Blog Posts</TabsTrigger>
+              </TabsList>
+            </ScrollReveal>
 
             <TabsContent value="all" className="space-y-4">
               {filtered.map((article, i) => (
-                <ArticleCard key={i} article={article} />
+                <ScrollReveal key={i} delay={i * 100}>
+                  <ArticleCard article={article} />
+                </ScrollReveal>
               ))}
             </TabsContent>
             <TabsContent value="analysis" className="space-y-4">
               {filtered.map((article, i) => (
-                <ArticleCard key={i} article={article} />
+                <ScrollReveal key={i} delay={i * 100}>
+                  <ArticleCard article={article} />
+                </ScrollReveal>
               ))}
             </TabsContent>
             <TabsContent value="blog" className="space-y-4">
               {filtered.map((article, i) => (
-                <ArticleCard key={i} article={article} />
+                <ScrollReveal key={i} delay={i * 100}>
+                  <ArticleCard article={article} />
+                </ScrollReveal>
               ))}
             </TabsContent>
           </Tabs>
