@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { ScrollReveal } from "@/hooks/useScrollAnimation";
 import heroImage from "@/assets/hero-stadium.jpg";
+import logo from "@/assets/logo.png";
 
 const featuredCards = [
   {
@@ -46,9 +47,7 @@ const Index = () => {
         />
         <div className="absolute inset-0 bg-background/70" />
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 animate-fade-in">
-            Ricardo <span className="text-primary">Dominguez</span>
-          </h1>
+          <img src={logo} alt="The Second Layer" className="h-32 md:h-44 lg:h-56 w-auto mx-auto mb-4 animate-fade-in" />
           <p className="text-lg md:text-xl text-muted-foreground mb-2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
             Sports Business | Innovation | Strategy
           </p>
