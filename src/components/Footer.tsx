@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Linkedin, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import logo from "@/assets/logo.png";
 
 const Footer = () => {
   return (
@@ -9,9 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <h3 className="font-heading text-xl font-bold mb-3">
-              <span className="text-primary">RD</span> Digital
-            </h3>
+            <img src={logo} alt="The Second Layer" className="h-12 w-auto mb-3" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Sports Business | Innovation | Strategy
             </p>
