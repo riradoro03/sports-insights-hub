@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, TrendingUp, Users, Target } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { ScrollReveal } from "@/hooks/useScrollAnimation";
-import heroImage from "@/assets/hero-stadium.jpg";
-import logo from "@/assets/logo.png";
+import { StadiumHero } from "@/components/ui/stadium-hero";
 
 const featuredCards = [
   {
@@ -39,31 +38,8 @@ const stats = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
-        <div className="absolute inset-0 bg-background/70" />
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <img src={logo} alt="The Second Layer" className="h-48 md:h-64 lg:h-80 w-auto mx-auto mb-4 animate-fade-in" />
-          <p className="text-lg md:text-xl text-muted-foreground mb-2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Sports Business | Innovation | Strategy
-          </p>
-          <p className="text-sm md:text-base text-muted-foreground/70 mb-8 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            Exploring the intersection of sport, business, and technology. Welcome to my digital space.
-          </p>
-          <div className="flex gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <Button asChild size="lg" className="font-heading tracking-wide">
-              <Link to="/about">Discover More <ArrowRight className="ml-2" size={18} /></Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="font-heading tracking-wide border-primary/50 text-primary hover:bg-primary/10">
-              <Link to="/projects">View Projects</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Hero — cinematic 3D stadium fly-in */}
+      <StadiumHero />
 
       {/* Stats Bar */}
       <ScrollReveal>
