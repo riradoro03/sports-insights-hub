@@ -312,7 +312,10 @@ export const StadiumHero = () => {
     <div ref={wrapperRef} style={{ height: `${TOTAL_SECTIONS * 100}vh` }} className="relative">
       <div className="sticky top-0 h-screen overflow-hidden">
 
-        {/* ── Stadium images with crossfade ── */}
+        {/* Three.js canvas (bottom layer) */}
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }} />
+
+        {/* ── Stadium images with crossfade (above canvas) ── */}
         {SECTIONS.map((sec, i) => (
           <div
             key={sec.id}
@@ -320,16 +323,14 @@ export const StadiumHero = () => {
             style={{
               backgroundImage: `url(${sec.image})`,
               opacity: imageOpacities[i],
-              zIndex: 1,
+              zIndex: 2,
+              mixBlendMode: 'screen',
             }}
           />
         ))}
 
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-background/50" style={{ zIndex: 2 }} />
-
-        {/* Three.js canvas */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 3 }} />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-background/30" style={{ zIndex: 3 }} />
 
         {/* Vignette */}
         <div
