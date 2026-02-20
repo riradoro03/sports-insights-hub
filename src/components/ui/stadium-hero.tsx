@@ -9,7 +9,9 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.png';
-import heroImage from '@/assets/hero-stadium.jpg';
+import stadiumSoccer from '@/assets/stadium-soccer.jpg';
+import stadiumFootball from '@/assets/stadium-football.jpg';
+import stadiumBasketball from '@/assets/stadium-basketball.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +22,7 @@ const SECTIONS = [
     title: 'THE PITCH',
     sub1: 'Where strategy meets performance,',
     sub2: 'and vision becomes victory.',
+    image: stadiumSoccer,
     cta: true,
   },
   {
@@ -27,6 +30,7 @@ const SECTIONS = [
     title: 'THE GAME',
     sub1: 'Beyond the scoreline lies the business —',
     sub2: 'brand, revenue, and relentless innovation.',
+    image: stadiumFootball,
     cta: false,
   },
   {
@@ -34,25 +38,22 @@ const SECTIONS = [
     title: 'THE FUTURE',
     sub1: 'In the space between sport and technology,',
     sub2: 'we find the next era of the beautiful game.',
+    image: stadiumBasketball,
     cta: false,
   },
 ];
 const TOTAL_SECTIONS = SECTIONS.length;
 
 // ─── Camera journey ───────────────────────────────────────────────────────
-// Starts far back (z=900), zooms to pitch level (z=60)
 const CAM_KEYFRAMES = [
-  { x: 0, y: 60,  z: 900 },   // section 0 – distant stadium view
-  { x: 0, y: 30,  z: 400 },   // section 1 – mid-field
-  { x: 0, y: 10,  z: 60  },   // section 2 – on the pitch
+  { x: 0, y: 60,  z: 900 },
+  { x: 0, y: 30,  z: 400 },
+  { x: 0, y: 10,  z: 60  },
 ];
 
 export const StadiumHero = () => {
-  // ── Refs ────────────────────────────────────────────────────────────────
   const wrapperRef        = useRef<HTMLDivElement>(null);
-  const stickyRef         = useRef<HTMLDivElement>(null);
   const canvasRef         = useRef<HTMLCanvasElement>(null);
-  const overlayImageRef   = useRef<HTMLDivElement>(null);
   const titleRefs         = useRef<(HTMLDivElement | null)[]>([]);
   const subtitleRefs      = useRef<(HTMLDivElement | null)[]>([]);
   const progressBarRef    = useRef<HTMLDivElement>(null);
@@ -63,6 +64,7 @@ export const StadiumHero = () => {
   const smoothCam = useRef({ x: 0, y: 60, z: 900 });
   const [isReady, setIsReady] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
+  const [imageOpacities, setImageOpacities] = useState([1, 0, 0]);
 
   const threeRefs = useRef<{
     scene: THREE.Scene | null;
@@ -71,15 +73,13 @@ export const StadiumHero = () => {
     composer: EffectComposer | null;
     stars: THREE.Points[];
     nebula: THREE.Mesh | null;
-    mountains: THREE.Mesh[];
-    locations: number[];
     animationId: number | null;
     targetCamX: number;
     targetCamY: number;
     targetCamZ: number;
   }>({
     scene: null, camera: null, renderer: null, composer: null,
-    stars: [], nebula: null, mountains: [], locations: [],
+    stars: [], nebula: null,
     animationId: null,
     targetCamX: 0, targetCamY: 60, targetCamZ: 900,
   });
@@ -89,22 +89,18 @@ export const StadiumHero = () => {
     if (!canvasRef.current) return;
     const R = threeRefs.current;
 
-    // Scene
     R.scene = new THREE.Scene();
     R.scene.fog = new THREE.FogExp2(0x000000, 0.00025);
 
-    // Camera
     R.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
     R.camera.position.set(0, 60, 900);
 
-    // Renderer
     R.renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, antialias: true, alpha: true });
     R.renderer.setSize(window.innerWidth, window.innerHeight);
     R.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     R.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     R.renderer.toneMappingExposure = 0.6;
 
-    // Post-processing: bloom
     R.composer = new EffectComposer(R.renderer);
     R.composer.addPass(new RenderPass(R.scene, R.camera));
     const bloom = new UnrealBloomPass(
@@ -179,78 +175,6 @@ export const StadiumHero = () => {
     addStars(3000, 1, [GREEN, WHITE, GREEN]);
     addStars(2000, 2, [ORANGE, WHITE, ORANGE]);
 
-    // ── Nebula (ground glow) ─────────────────────────────────────────────
-    const nebGeo = new THREE.PlaneGeometry(8000, 4000, 100, 100);
-    const nebMat = new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0 },
-        color1: { value: GREEN },
-        color2: { value: ORANGE },
-        opacity: { value: 0.25 },
-      },
-      vertexShader: /* glsl */`
-        varying vec2 vUv;
-        varying float vElev;
-        uniform float time;
-        void main() {
-          vUv = uv;
-          vec3 p = position;
-          float e = sin(p.x * 0.01 + time) * cos(p.y * 0.01 + time) * 20.0;
-          p.z += e; vElev = e;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
-        }
-      `,
-      fragmentShader: /* glsl */`
-        uniform vec3 color1; uniform vec3 color2;
-        uniform float opacity; uniform float time;
-        varying vec2 vUv; varying float vElev;
-        void main() {
-          float m = sin(vUv.x * 10.0 + time) * cos(vUv.y * 10.0 + time);
-          vec3 col = mix(color1, color2, m * 0.5 + 0.5);
-          float a = opacity * (1.0 - length(vUv - 0.5) * 2.0);
-          a *= 1.0 + vElev * 0.01;
-          gl_FragColor = vec4(col, a);
-        }
-      `,
-      transparent: true, blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide, depthWrite: false,
-    });
-    R.nebula = new THREE.Mesh(nebGeo, nebMat);
-    R.nebula.position.z = -1050;
-    R.scene.add(R.nebula);
-
-    // ── Mountains (stadium silhouette layers) ───────────────────────────
-    const layers = [
-      { distance: -50,  height: 60,  color: 0x0d1f0d, opacity: 1.0 },
-      { distance: -100, height: 80,  color: 0x0a2e0a, opacity: 0.85 },
-      { distance: -150, height: 100, color: 0x083808, opacity: 0.65 },
-      { distance: -200, height: 120, color: 0x052805, opacity: 0.45 },
-    ];
-    layers.forEach((layer) => {
-      const pts2d: THREE.Vector2[] = [];
-      for (let i = 0; i <= 50; i++) {
-        const x = (i / 50 - 0.5) * 1000;
-        const y = Math.sin(i * 0.1) * layer.height
-                + Math.sin(i * 0.05) * layer.height * 0.5
-                + Math.random() * layer.height * 0.2 - 100;
-        pts2d.push(new THREE.Vector2(x, y));
-      }
-      pts2d.push(new THREE.Vector2(5000, -300), new THREE.Vector2(-5000, -300));
-      const shape = new THREE.Shape(pts2d);
-      const geo   = new THREE.ShapeGeometry(shape);
-      const mat   = new THREE.MeshBasicMaterial({
-        color: layer.color, transparent: true,
-        opacity: layer.opacity, side: THREE.DoubleSide,
-      });
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.position.z = layer.distance;
-      mesh.position.y = layer.distance;
-      mesh.userData = { baseZ: layer.distance };
-      R.scene!.add(mesh);
-      R.mountains.push(mesh);
-    });
-    R.locations = R.mountains.map(m => m.position.z);
-
     // ── Atmosphere glow ──────────────────────────────────────────────────
     const atmoMat = new THREE.ShaderMaterial({
       uniforms: { time: { value: 0 } },
@@ -282,10 +206,8 @@ export const StadiumHero = () => {
       const t = Date.now() * 0.001;
 
       R.stars.forEach(s => { (s.material as THREE.ShaderMaterial).uniforms.time.value = t; });
-      if (R.nebula) (R.nebula.material as THREE.ShaderMaterial).uniforms.time.value = t * 0.5;
       (atmoMat as THREE.ShaderMaterial).uniforms.time.value = t;
 
-      // Smooth camera
       const ease = 0.05;
       smoothCam.current.x += (R.targetCamX - smoothCam.current.x) * ease;
       smoothCam.current.y += (R.targetCamY - smoothCam.current.y) * ease;
@@ -295,19 +217,12 @@ export const StadiumHero = () => {
       R.camera!.position.z = smoothCam.current.z;
       R.camera!.lookAt(0, 10, -600);
 
-      // Mountain parallax
-      R.mountains.forEach((m, i) => {
-        m.position.x = Math.sin(t * 0.1) * 2 * (1 + i * 0.5);
-        m.position.y = (R.locations[i] ?? 0) + Math.cos(t * 0.15) * (1 + i * 0.5);
-      });
-
       R.composer!.render();
     };
     animate();
 
     setIsReady(true);
 
-    // Resize
     const onResize = () => {
       if (!R.camera || !R.renderer || !R.composer) return;
       R.camera.aspect = window.innerWidth / window.innerHeight;
@@ -321,13 +236,11 @@ export const StadiumHero = () => {
       if (R.animationId) cancelAnimationFrame(R.animationId);
       window.removeEventListener('resize', onResize);
       R.stars.forEach(s => { s.geometry.dispose(); (s.material as THREE.Material).dispose(); });
-      R.mountains.forEach(m => { m.geometry.dispose(); (m.material as THREE.Material).dispose(); });
-      R.nebula?.geometry.dispose(); (R.nebula?.material as THREE.Material | undefined)?.dispose();
       R.renderer?.dispose();
     };
   }, []);
 
-  // ── Scroll → camera & section state ─────────────────────────────────────
+  // ── Scroll → camera, section state & image crossfade ────────────────────
   useEffect(() => {
     const onScroll = () => {
       const el = wrapperRef.current;
@@ -338,7 +251,7 @@ export const StadiumHero = () => {
 
       const R = threeRefs.current;
 
-      // Camera interpolation across keyframes
+      // Camera interpolation
       const totalProgress = progress * (TOTAL_SECTIONS - 1);
       const idx  = Math.min(Math.floor(totalProgress), TOTAL_SECTIONS - 2);
       const frac = totalProgress - idx;
@@ -352,28 +265,25 @@ export const StadiumHero = () => {
       const sec = Math.min(Math.floor(progress * TOTAL_SECTIONS), TOTAL_SECTIONS - 1);
       setCurrentSection(sec);
 
+      // Image crossfade: calculate opacity for each image
+      const opacities = [0, 0, 0];
+      const sectionProgress = progress * TOTAL_SECTIONS;
+      for (let i = 0; i < TOTAL_SECTIONS; i++) {
+        const dist = Math.abs(sectionProgress - (i + 0.5));
+        opacities[i] = Math.max(0, 1 - dist * 1.5);
+      }
+      // Ensure at least one is fully visible
+      const maxOp = Math.max(...opacities);
+      if (maxOp > 0) {
+        opacities.forEach((_, i) => { opacities[i] = opacities[i] / maxOp; });
+      } else {
+        opacities[0] = 1;
+      }
+      setImageOpacities(opacities);
+
       // Progress bar
       if (progressBarRef.current) progressBarRef.current.style.width = `${progress * 100}%`;
       if (sectionLabelRef.current) sectionLabelRef.current.textContent = `0${sec + 1} / 0${TOTAL_SECTIONS}`;
-
-      // Nebula & mountain scroll parallax
-      R.mountains.forEach((m, i) => {
-        const speed = 1 + i * 0.9;
-        const tz = m.userData.baseZ + scrollY * speed * 0.5;
-        if (progress > 0.85) {
-          m.position.z = 600000; // shoot off screen at end
-        } else {
-          m.position.z = R.locations[i] ?? 0;
-          if (R.nebula) R.nebula.position.z = tz - 100;
-        }
-      });
-
-      // Overlay image zoom-in effect
-      if (overlayImageRef.current) {
-        const scale = 1 + progress * 0.15;
-        overlayImageRef.current.style.transform = `scale(${scale})`;
-        overlayImageRef.current.style.opacity   = String(Math.max(0, 1 - progress * 2.5));
-      }
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -402,7 +312,7 @@ export const StadiumHero = () => {
     return () => { tl.kill(); };
   }, [isReady]);
 
-  // ── Section transition animations (GSAP on section change) ──────────────
+  // ── Section transition animations ──────────────────────────────────────
   useEffect(() => {
     if (!isReady) return;
     const title = titleRefs.current[currentSection];
@@ -410,7 +320,6 @@ export const StadiumHero = () => {
     if (title) gsap.fromTo(title, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' });
     if (sub)   gsap.fromTo(sub,   { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.15 });
 
-    // Hide other sections
     titleRefs.current.forEach((t, i) => {
       if (i !== currentSection && t) gsap.to(t, { opacity: 0, duration: 0.4 });
     });
@@ -418,47 +327,49 @@ export const StadiumHero = () => {
       if (i !== currentSection && s) gsap.to(s, { opacity: 0, duration: 0.3 });
     });
 
-    // Show/hide CTA only on first section
     if (ctaRef.current) {
       gsap.to(ctaRef.current, { opacity: currentSection === 0 ? 1 : 0, duration: 0.5 });
     }
   }, [currentSection, isReady]);
 
   return (
-    // Tall wrapper that provides the scroll distance
     <div ref={wrapperRef} style={{ height: `${TOTAL_SECTIONS * 100}vh` }} className="relative">
+      <div className="sticky top-0 h-screen overflow-hidden">
 
-      {/* ── Sticky viewport ── */}
-      <div ref={stickyRef} className="sticky top-0 h-screen overflow-hidden">
+        {/* ── Stadium images with crossfade ── */}
+        {SECTIONS.map((sec, i) => (
+          <div
+            key={sec.id}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-[opacity] transition-none"
+            style={{
+              backgroundImage: `url(${sec.image})`,
+              opacity: imageOpacities[i],
+              zIndex: 1,
+            }}
+          />
+        ))}
 
-        {/* Stadium photo — zooms in on scroll */}
-        <div
-          ref={overlayImageRef}
-          className="absolute inset-0 bg-cover bg-center transition-none will-change-transform"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
-        {/* Dark gradient base */}
-        <div className="absolute inset-0 bg-background/55" />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-background/50" style={{ zIndex: 2 }} />
 
         {/* Three.js canvas */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 3 }} />
 
         {/* Vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.75) 100%)' }}
+          style={{ background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.75) 100%)', zIndex: 4 }}
         />
 
         {/* ── Logo ── */}
         <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20">
-          <img src={logo} alt="The Second Layer" className="h-20 md:h-28 w-auto drop-shadow-2xl" />
+          <img src={logo} alt="The Second Layer" className="h-48 md:h-64 lg:h-80 w-auto drop-shadow-2xl" />
         </div>
 
-        {/* ── Section text (stacked, one visible at a time) ── */}
+        {/* ── Section text ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none px-4">
           {SECTIONS.map((sec, i) => (
             <div key={sec.id} className="absolute text-center max-w-3xl">
-              {/* Title */}
               <div
                 ref={el => { titleRefs.current[i] = el; }}
                 style={{ opacity: 0 }}
@@ -467,7 +378,6 @@ export const StadiumHero = () => {
                   {sec.title}
                 </h1>
               </div>
-              {/* Subtitle */}
               <div
                 ref={el => { subtitleRefs.current[i] = el; }}
                 style={{ opacity: 0 }}
@@ -502,7 +412,6 @@ export const StadiumHero = () => {
 
         {/* ── Bottom HUD ── */}
         <div className="absolute bottom-6 left-0 right-0 z-20 flex items-end justify-between px-8">
-          {/* Progress bar */}
           <div className="flex flex-col gap-1 w-48">
             <div className="h-px bg-border/40 relative overflow-hidden rounded-full">
               <div
@@ -519,13 +428,11 @@ export const StadiumHero = () => {
             </span>
           </div>
 
-          {/* Scroll indicator */}
           <div ref={scrollLineRef} className="flex flex-col items-center gap-1" style={{ opacity: 0 }}>
             <span className="font-heading text-[10px] tracking-[0.35em] text-muted-foreground uppercase">Scroll</span>
             <div className="w-px h-10 bg-gradient-to-b from-primary to-transparent animate-pulse" />
           </div>
 
-          {/* Section dots */}
           <div className="flex gap-2">
             {SECTIONS.map((_, i) => (
               <div
