@@ -338,10 +338,6 @@ export const StadiumHero = () => {
           style={{ background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.75) 100%)', zIndex: 4 }}
         />
 
-        {/* ── Logo ── */}
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20">
-          <img src={logo} alt="The Second Layer" className="h-48 md:h-64 lg:h-80 w-auto drop-shadow-2xl" />
-        </div>
 
         {/* ── Section text ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none px-4">
