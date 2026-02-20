@@ -175,30 +175,7 @@ export const StadiumHero = () => {
     addStars(3000, 1, [GREEN, WHITE, GREEN]);
     addStars(2000, 2, [ORANGE, WHITE, ORANGE]);
 
-    // ── Atmosphere glow ──────────────────────────────────────────────────
-    const atmoMat = new THREE.ShaderMaterial({
-      uniforms: { time: { value: 0 } },
-      vertexShader: /* glsl */`
-        varying vec3 vNormal;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: /* glsl */`
-        varying vec3 vNormal;
-        uniform float time;
-        void main() {
-          float i = pow(0.7 - dot(vNormal, vec3(0,0,1)), 2.0);
-          vec3 col = mix(vec3(0.1,0.6,0.2), vec3(1.0,0.4,0.0), i) * i;
-          float pulse = sin(time * 1.5) * 0.08 + 0.92;
-          gl_FragColor = vec4(col * pulse, i * 0.3);
-        }
-      `,
-      side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true,
-    });
-    const atmo = new THREE.Mesh(new THREE.SphereGeometry(600, 32, 32), atmoMat);
-    R.scene.add(atmo);
+    // (No atmosphere sphere — stadium images provide the backdrop)
 
     // ── Animate loop ─────────────────────────────────────────────────────
     const animate = () => {
@@ -206,7 +183,6 @@ export const StadiumHero = () => {
       const t = Date.now() * 0.001;
 
       R.stars.forEach(s => { (s.material as THREE.ShaderMaterial).uniforms.time.value = t; });
-      (atmoMat as THREE.ShaderMaterial).uniforms.time.value = t;
 
       const ease = 0.05;
       smoothCam.current.x += (R.targetCamX - smoothCam.current.x) * ease;
